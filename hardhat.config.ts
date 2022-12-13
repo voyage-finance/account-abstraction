@@ -3,10 +3,12 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-
+import { config as dotenvConfig } from 'dotenv'
+import { resolve } from 'path'
 import 'solidity-coverage'
-
 import * as fs from 'fs'
+
+dotenvConfig({ path: resolve(__dirname, './.env') })
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
@@ -54,7 +56,13 @@ const config: HardhatUserConfig = {
     localgeth: { url: 'http://localgeth:8545' },
     goerli: getNetwork('goerli'),
     proxy: getNetwork1('http://localhost:8545'),
-    kovan: getNetwork('kovan')
+    kovan: getNetwork('kovan'),
+    polygon: {
+      url: 'https://polygon-rpc.com/',
+      accounts: {
+        mnemonic: process.env.POLYGON_MNEMONIC
+      }
+    }
   },
   mocha: {
     timeout: 10000
@@ -62,6 +70,16 @@ const config: HardhatUserConfig = {
 
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
+  },
+
+  typechain: {
+    outDir: 'contract-types',
+    target: 'ethers-v5'
+  },
+
+  namedAccounts: {
+    // deployer/owner signer can now be accessed as accounts[0]
+    owner: 0
   }
 
 }
