@@ -1,19 +1,16 @@
-import { ethers, getNamedAccounts, deployments } from 'hardhat';
-import { EntryPoint } from '../typechain';
+import { ethers, getNamedAccounts, deployments } from 'hardhat'
+import { EntryPoint } from '../typechain'
 
-async function main() {
-    const entryPointFactory = await ethers.getContractFactory('EntryPoint');
-    const entryPoint = await entryPointFactory.attach('0x8fdb1b58ed14a0630475713dca0bba6c061694f1')
-    const options = {value: ethers.utils.parseEther("1.0")}
-    const tx = await entryPoint.depositTo('0x0736490803771d7f8c39AcAaBaA2Fd22D4F2BC5F',options)
-    await tx.wait()
+async function main () {
+  const entryPoint = await ethers.getContractAt('EntryPoint','0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512')
+  const options = { value: ethers.utils.parseEther('300') }
+  const tx = await entryPoint.depositTo('0xDfFa5a8C826C2199a720917a557cEd2ec56A62f1', options)
+  await tx.wait()
 }
-
-
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+    console.error(error)
+    process.exit(1)
+  })

@@ -46,7 +46,7 @@ interface IEntryPoint is IStakeManager {
      *   Should be caught in off-chain handleOps simulation and not happen on-chain.
      *   Useful for mitigating DoS attempts against batchers or for troubleshooting of account/paymaster reverts.
      */
-    error FailedOp(uint256 opIndex, address paymaster, string reason);
+    error FailedOp(uint256 opIndex, address paymaster, string reason, uint256 balance, uint256 requiredFund);
 
     /**
      * error case when a signature aggregator fails to verify the aggregated signature it had created.

@@ -258,11 +258,11 @@ contract EntryPoint is IEntryPoint, StakeManager {
     // create the sender's contract if needed.
     function _createSenderIfNeeded(uint256 opIndex, MemoryUserOp memory mUserOp, bytes calldata initCode) internal {
         if (initCode.length != 0) {
-            if (mUserOp.sender.code.length != 0) revert FailedOp(opIndex, address(0), "sender already constructed");
+            if (mUserOp.sender.code.length != 0) revert FailedOp(opIndex, address(0), "sender already constructed",0,0);
             address sender1 = senderCreator.createSender(initCode);
-            if (sender1 == address(0)) revert FailedOp(opIndex, address(0), "initCode failed");
-            if (sender1 != mUserOp.sender) revert FailedOp(opIndex, address(0), "sender doesn't match initCode address");
-            if (sender1.code.length == 0) revert FailedOp(opIndex, address(0), "initCode failed to create sender");
+            if (sender1 == address(0)) revert FailedOp(opIndex, address(0), "initCode failed",0,0);
+            if (sender1 != mUserOp.sender) revert FailedOp(opIndex, address(0), "sender doesn't match initCode address",0,0);
+            if (sender1.code.length == 0) revert FailedOp(opIndex, address(0), "initCode failed to create sender",0,0);
         }
     }
 
@@ -304,19 +304,19 @@ contract EntryPoint is IEntryPoint, StakeManager {
         try IAccount(sender).validateUserOp{gas : mUserOp.verificationGasLimit}(op, opInfo.userOpHash, aggregator, missingAccountFunds) returns (uint256 _deadline) {
             // solhint-disable-next-line not-rely-on-time
             if (_deadline != 0 && _deadline < block.timestamp) {
-                revert FailedOp(opIndex, address(0), "expired");
+                revert FailedOp(opIndex, address(0), "expired",0,0);
             }
             deadline = _deadline;
         } catch Error(string memory revertReason) {
-            revert FailedOp(opIndex, address(0), revertReason);
+            revert FailedOp(opIndex, address(0), revertReason,0,0);
         } catch {
-            revert FailedOp(opIndex, address(0), "");
+            revert FailedOp(opIndex, address(0), "",0,0);
         }
         if (paymaster == address(0)) {
             DepositInfo storage senderInfo = deposits[sender];
             uint256 deposit = senderInfo.deposit;
             if (requiredPrefund > deposit) {
-                revert FailedOp(opIndex, address(0), "account didn't pay prefund");
+                revert FailedOp(opIndex, address(0), "account didn't pay prefund x",deposit,requiredPrefund);
             }
             senderInfo.deposit = uint112(deposit - requiredPrefund);
         }
@@ -339,24 +339,24 @@ contract EntryPoint is IEntryPoint, StakeManager {
         uint256 deposit = paymasterInfo.deposit;
         bool staked = paymasterInfo.staked;
         if (!staked) {
-            revert FailedOp(opIndex, paymaster, "not staked");
+            revert FailedOp(opIndex, paymaster, "not staked",0,0);
         }
         if (deposit < requiredPreFund) {
-            revert FailedOp(opIndex, paymaster, "paymaster deposit too low");
+            revert FailedOp(opIndex, paymaster, "paymaster deposit too low",0,0);
         }
         paymasterInfo.deposit = uint112(deposit - requiredPreFund);
         uint256 gas = mUserOp.verificationGasLimit - gasUsedByValidateAccountPrepayment;
         try IPaymaster(paymaster).validatePaymasterUserOp{gas : gas}(op, opInfo.userOpHash, requiredPreFund) returns (bytes memory _context, uint256 _deadline){
             // solhint-disable-next-line not-rely-on-time
             if (_deadline != 0 && _deadline < block.timestamp) {
-                revert FailedOp(opIndex, paymaster, "expired");
+                revert FailedOp(opIndex, paymaster, "expired",0,0);
             }
             context = _context;
             deadline = _deadline;
         } catch Error(string memory revertReason) {
-            revert FailedOp(opIndex, paymaster, revertReason);
+            revert FailedOp(opIndex, paymaster, revertReason,0,0);
         } catch {
-            revert FailedOp(opIndex, paymaster, "");
+            revert FailedOp(opIndex, paymaster, "",0,0);
         }
     }
     }
@@ -404,7 +404,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         uint256 gasUsed = preGas - gasleft();
 
         if (userOp.verificationGasLimit < gasUsed) {
-            revert FailedOp(opIndex, mUserOp.paymaster, "Used more than verificationGasLimit");
+            revert FailedOp(opIndex, mUserOp.paymaster, "Used more than verificationGasLimit",0,0);
         }
         outOpInfo.prefund = requiredPreFund;
         outOpInfo.contextOffset = getOffsetOfMemoryBytes(context);
@@ -443,10 +443,10 @@ contract EntryPoint is IEntryPoint, StakeManager {
                     // solhint-disable-next-line no-empty-blocks
                     try IPaymaster(paymaster).postOp{gas : mUserOp.verificationGasLimit}(mode, context, actualGasCost) {}
                     catch Error(string memory reason) {
-                        revert FailedOp(opIndex, paymaster, reason);
+                        revert FailedOp(opIndex, paymaster, reason,0,0);
                     }
                     catch {
-                        revert FailedOp(opIndex, paymaster, "postOp revert");
+                        revert FailedOp(opIndex, paymaster, "postOp revert",0,0);
                     }
                 }
             }
@@ -454,7 +454,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         actualGas += preGas - gasleft();
         actualGasCost = actualGas * gasPrice;
         if (opInfo.prefund < actualGasCost) {
-            revert FailedOp(opIndex, paymaster, "prefund below actualGasCost");
+            revert FailedOp(opIndex, paymaster, "prefund below actualGasCost",0,0);
         }
         uint256 refund = opInfo.prefund - actualGasCost;
         internalIncrementDeposit(refundAddress, refund);

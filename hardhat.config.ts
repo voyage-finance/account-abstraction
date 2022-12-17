@@ -3,12 +3,17 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
+import * as tdly from "@tenderly/hardhat-tenderly";
 import { config as dotenvConfig } from 'dotenv'
 import { resolve } from 'path'
 import 'solidity-coverage'
 import * as fs from 'fs'
 
 dotenvConfig({ path: resolve(__dirname, './.env') })
+tdly.setup({ automaticVerifications: true});
+
+const TENDERLY_CHAIN_ID = parseInt(process.env.TENDERLY_CHAIN_ID ?? "1");
+const TENDERLY_FORK_URL = process.env.TENDERLY_FORK_URL ?? "";
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
@@ -44,25 +49,33 @@ const config: HardhatUserConfig = {
       settings: {
         optimizer: { enabled: true, runs: 1000000 }
       }
-    }],
-    overrides: {
-      'contracts/core/EntryPoint.sol': optimizedComilerSettings,
-      'contracts/samples/SimpleAccount.sol': optimizedComilerSettings
-    }
+    }]
   },
   networks: {
     dev: { url: 'http://localhost:8545' },
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
-    goerli: getNetwork('goerli'),
     proxy: getNetwork1('http://localhost:8545'),
     kovan: getNetwork('kovan'),
+    goerli: {
+      url: 'https://goerli.infura.io/v3/',
+      accounts: {
+        mnemonic: process.env.POLYGON_MNEMONIC
+      }
+    },
     polygon: {
       url: 'https://polygon-rpc.com/',
       accounts: {
         mnemonic: process.env.POLYGON_MNEMONIC
       }
-    }
+    },
+    tenderly: {
+      chainId: TENDERLY_CHAIN_ID,
+      url: TENDERLY_FORK_URL,
+      accounts: {
+          mnemonic: process.env.TENDERLY_MNEMONIC,
+      },
+  },
   },
   mocha: {
     timeout: 10000
@@ -71,6 +84,12 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
+
+  tenderly: {
+    project: "protocol-v1",
+    username: "voyage-finance",
+    privateVerification: true,
+},
 
   typechain: {
     outDir: 'contract-types',
