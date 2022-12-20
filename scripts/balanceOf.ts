@@ -1,5 +1,4 @@
-import { ethers, getNamedAccounts, deployments } from 'hardhat'
-import { EntryPoint } from '../typechain'
+import { ethers } from 'hardhat'
 
 async function main () {
   const entryPointFactory = await ethers.getContractFactory('EntryPoint')

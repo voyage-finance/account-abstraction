@@ -1,10 +1,9 @@
-import { ethers, getNamedAccounts, deployments } from 'hardhat'
-import { EntryPoint } from '../typechain'
+import { ethers } from 'hardhat'
 
 async function main () {
-  const entryPoint = await ethers.getContractAt('EntryPoint','0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512')
+  const entryPoint = await ethers.getContractAt('EntryPoint', '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0')
   const options = { value: ethers.utils.parseEther('300') }
-  const tx = await entryPoint.depositTo('0xDfFa5a8C826C2199a720917a557cEd2ec56A62f1', options)
+  const tx = await entryPoint.depositTo('0xA4aee88c32C4aA04519e6520BA0712030c57933e', options)
   await tx.wait()
 }
 

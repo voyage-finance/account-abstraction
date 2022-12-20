@@ -3,17 +3,17 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-import * as tdly from "@tenderly/hardhat-tenderly";
+import * as tdly from '@tenderly/hardhat-tenderly'
 import { config as dotenvConfig } from 'dotenv'
 import { resolve } from 'path'
 import 'solidity-coverage'
 import * as fs from 'fs'
 
 dotenvConfig({ path: resolve(__dirname, './.env') })
-tdly.setup({ automaticVerifications: true});
+tdly.setup({ automaticVerifications: true })
 
-const TENDERLY_CHAIN_ID = parseInt(process.env.TENDERLY_CHAIN_ID ?? "1");
-const TENDERLY_FORK_URL = process.env.TENDERLY_FORK_URL ?? "";
+const TENDERLY_CHAIN_ID = parseInt(process.env.TENDERLY_CHAIN_ID ?? '1')
+const TENDERLY_FORK_URL = process.env.TENDERLY_FORK_URL ?? ''
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
@@ -52,7 +52,7 @@ const config: HardhatUserConfig = {
     }]
   },
   networks: {
-    dev: { url: 'http://localhost:8545' },
+    dev: { url: 'http://localhost:8545', chainId: 31337 },
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
     proxy: getNetwork1('http://localhost:8545'),
@@ -73,9 +73,9 @@ const config: HardhatUserConfig = {
       chainId: TENDERLY_CHAIN_ID,
       url: TENDERLY_FORK_URL,
       accounts: {
-          mnemonic: process.env.TENDERLY_MNEMONIC,
-      },
-  },
+        mnemonic: process.env.TENDERLY_MNEMONIC
+      }
+    }
   },
   mocha: {
     timeout: 10000
@@ -86,10 +86,10 @@ const config: HardhatUserConfig = {
   },
 
   tenderly: {
-    project: "protocol-v1",
-    username: "voyage-finance",
-    privateVerification: true,
-},
+    project: 'protocol-v1',
+    username: 'voyage-finance',
+    privateVerification: true
+  },
 
   typechain: {
     outDir: 'contract-types',
