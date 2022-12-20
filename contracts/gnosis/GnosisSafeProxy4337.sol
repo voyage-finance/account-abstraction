@@ -4,7 +4,8 @@ pragma solidity ^0.8.7;
 /* solhint-disable avoid-low-level-calls */
 
 import "./EIP4337Manager.sol";
-import "@gnosis.pm/safe-contracts/contracts/proxies/GnosisSafeProxy.sol";
+import "hardhat/console.sol";
+import "./GnosisSafeProxy.sol";
 
 /**
  * Create a proxy to a GnosisSafe, which accepts calls through Account-Abstraction.
@@ -17,6 +18,7 @@ contract SafeProxy4337 is GnosisSafeProxy {
         address singleton, EIP4337Manager aaModule,
         address owner
     ) GnosisSafeProxy(singleton) {
+        console.log("SafeProxy4337");
         (bool success,bytes memory ret) = address(aaModule).delegatecall(abi.encodeCall(
                 EIP4337Manager.setupEIP4337, (singleton, aaModule, owner)));
         require(success, string(ret));

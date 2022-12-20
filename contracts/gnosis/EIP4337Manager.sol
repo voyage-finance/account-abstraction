@@ -131,7 +131,7 @@ contract EIP4337Manager is GnosisSafe, IAccount {
         try _entryPoint.handleOps(userOps, payable(msg.sender)) {
             revert("validateEip4337: handleOps must fail");
         } catch (bytes memory error) {
-            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,address,string)", 0, address(0), "account: wrong signature"))) {
+            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,address,string,uint256,uint256)", 0, address(0), "account: wrong signature"))) {
                 revert(string(error));
             }
         }

@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
-import { GnosisSafe__factory, EntryPoint__factory, TestCounter__factory, EIP4337Manager__factory, SafeProxy4337__factory } from '../typechain'
+import { TestCounter__factory } from '../typechain'
 
 const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre
@@ -10,9 +10,11 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('deploy GnosisSafe Factory')
   const provider = ethers.provider
   const ethersSigner = provider.getSigner()
-  const safeSingleton = await new GnosisSafe__factory(ethersSigner).deploy()
-  console.log('safe singleton address: ', safeSingleton.address)
-
+  const safeSingleton = await deploy('GnosisSafe', {
+    contract: 'contracts/gnosis/GnosisSafe.sol:GnosisSafe',
+    from: owner,
+    log: true
+  })
   console.log('deploy EntryPoint')
   const entryPoint = await deploy('EntryPoint', {
     from: owner,
@@ -21,16 +23,30 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('EntryPoint address: ', entryPoint.address)
 
   console.log('deploy EIP4337 Manager')
-  const manager = await new EIP4337Manager__factory(ethersSigner).deploy(entryPoint.address)
+  const manager = await deploy('EIP4337Manager', {
+    from: owner,
+    args: [entryPoint.address],
+    log: true
+  })
   console.log('EIP4337 Manager address: ', manager.address)
 
   console.log('deploy TestCounter')
   const counter = await new TestCounter__factory(ethersSigner).deploy()
   console.log('Test counter address: ', counter.address)
-
   console.log('deploy SafeProxy')
-  const safeProxy = await new SafeProxy4337__factory(ethersSigner).deploy(safeSingleton.address, manager.address, owner)
-  console.log('Safe Proxy address: ', safeProxy.address)
+  const safeProxy4337 = await deploy('SafeProxy4337', {
+    from: owner,
+    args: [safeSingleton.address, manager.address, owner],
+    log: true
+  })
+  console.log('Safe Proxy address: ', safeProxy4337.address)
+
+  console.log('deploy SimpleAccount')
+  const simpleAccount = await deploy('', {
+    from: owner,
+    args: [entryPoint.address, '0xeecc6df760b5da6e40559a3b7b143614edaa6aa2']
+  })
+  console.log('simpleAccount address: ', simpleAccount.address)
 }
 
 export default main

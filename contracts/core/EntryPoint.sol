@@ -19,6 +19,7 @@ import "../interfaces/ICreate2Deployer.sol";
 import "../utils/Exec.sol";
 import "./StakeManager.sol";
 import "./SenderCreator.sol";
+import "hardhat/console.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager {
 
@@ -68,6 +69,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
      * @param beneficiary the address to receive the fees
      */
     function handleOps(UserOperation[] calldata ops, address payable beneficiary) public {
+        console.log("handleOps");
 
         uint256 opslen = ops.length;
         UserOpInfo[] memory opInfos = new UserOpInfo[](opslen);
