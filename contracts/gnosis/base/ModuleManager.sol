@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.7.0 <0.9.0;
+
 import "../common/Enum.sol";
 import "../common/SelfAuthorized.sol";
 import "./Executor.sol";
+import "hardhat/console.sol";
 
 /// @title Module Manager - A contract that manages modules that can execute transactions via this contract
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -64,6 +66,7 @@ contract ModuleManager is SelfAuthorized, Executor {
         bytes memory data,
         Enum.Operation operation
     ) public virtual returns (bool success) {
+        console.log("execTransactionFromModule");
         // Only whitelisted modules are allowed.
         require(msg.sender != SENTINEL_MODULES && modules[msg.sender] != address(0), "GS104");
         // Execute transaction without further confirmations.

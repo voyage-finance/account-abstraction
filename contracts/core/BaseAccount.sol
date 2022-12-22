@@ -7,6 +7,7 @@ pragma solidity ^0.8.12;
 
 import "../interfaces/IAccount.sol";
 import "../interfaces/IEntryPoint.sol";
+import "hardhat/console.sol";
 
 /**
  * Basic account implementation.
@@ -34,12 +35,16 @@ abstract contract BaseAccount is IAccount {
      */
     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, address aggregator, uint256 missingAccountFunds)
     external override virtual returns (uint256 deadline) {
+        console.log("start BaseAccount.validateUserOp");
         _requireFromEntryPoint();
+        console.log("end checking entry point");
         deadline = _validateSignature(userOp, userOpHash, aggregator);
         if (userOp.initCode.length == 0) {
             _validateAndUpdateNonce(userOp);
         }
+        console.log("end checking deadline");
         _payPrefund(missingAccountFunds);
+        console.log("end _payPrefund");
     }
 
     /**

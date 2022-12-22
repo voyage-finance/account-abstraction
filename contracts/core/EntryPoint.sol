@@ -19,6 +19,7 @@ import "../interfaces/ICreate2Deployer.sol";
 import "../utils/Exec.sol";
 import "./StakeManager.sol";
 import "./SenderCreator.sol";
+import "../samples/SimpleAccount.sol";
 import "hardhat/console.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager {
@@ -49,6 +50,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
      * @return collected the total amount this userOp paid.
      */
     function _executeUserOp(uint256 opIndex, UserOperation calldata userOp, UserOpInfo memory opInfo) private returns (uint256 collected) {
+        console.log("_executeUserOp");
         uint256 preGas = gasleft();
         bytes memory context = getMemoryBytesFromOffset(opInfo.contextOffset);
 
@@ -69,7 +71,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
      * @param beneficiary the address to receive the fees
      */
     function handleOps(UserOperation[] calldata ops, address payable beneficiary) public {
-        console.log("handleOps");
+        console.log("start handleOps");
 
         uint256 opslen = ops.length;
         UserOpInfo[] memory opInfos = new UserOpInfo[](opslen);
@@ -78,6 +80,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         for (uint256 i = 0; i < opslen; i++) {
             _validatePrepayment(i, ops[i], opInfos[i], address(0));
         }
+        console.log("end _validatePrepayment");
 
         uint256 collected = 0;
 
@@ -85,7 +88,12 @@ contract EntryPoint is IEntryPoint, StakeManager {
             collected += _executeUserOp(i, ops[i], opInfos[i]);
         }
 
+        console.log("end _executeUserOp");
+
+
         _compensate(beneficiary, collected);
+        console.log("end handleOps");
+
     } //unchecked
     }
 
@@ -174,9 +182,13 @@ contract EntryPoint is IEntryPoint, StakeManager {
 
         IPaymaster.PostOpMode mode = IPaymaster.PostOpMode.opSucceeded;
         if (callData.length > 0) {
-
-            (bool success,bytes memory result) = address(mUserOp.sender).call{gas : mUserOp.callGasLimit}(callData);
+            console.log("start calling scw: ", mUserOp.sender, mUserOp.callGasLimit);
+            console.logBytes(callData);
+            SimpleAccount(payable(mUserOp.sender)).nonce();
+            (bool success,bytes memory result) = payable(mUserOp.sender).call{gas : mUserOp.callGasLimit}(callData);
             if (!success) {
+                console.log("fail");
+                console.logBytes(result);
                 if (result.length > 0) {
                     emit UserOperationRevertReason(opInfo.userOpHash, mUserOp.sender, mUserOp.nonce, result);
                 }
@@ -303,17 +315,26 @@ contract EntryPoint is IEntryPoint, StakeManager {
             uint256 bal = balanceOf(sender);
             missingAccountFunds = bal > requiredPrefund ? 0 : requiredPrefund - bal;
         }
+        console.log("start validateUserOp");
+        console.log("sender: ", sender);
+        uint256 nonce = SimpleAccount(payable(sender)).nonce();
+        console.log("nonce: ", nonce);
+        console.log("gas: ", mUserOp.verificationGasLimit);
         try IAccount(sender).validateUserOp{gas : mUserOp.verificationGasLimit}(op, opInfo.userOpHash, aggregator, missingAccountFunds) returns (uint256 _deadline) {
+            console.log("failed 1");
             // solhint-disable-next-line not-rely-on-time
             if (_deadline != 0 && _deadline < block.timestamp) {
                 revert FailedOp(opIndex, address(0), "expired",0,0);
             }
             deadline = _deadline;
         } catch Error(string memory revertReason) {
+            console.log("failed 2");
             revert FailedOp(opIndex, address(0), revertReason,0,0);
         } catch {
+            console.log("failed 3");
             revert FailedOp(opIndex, address(0), "",0,0);
         }
+        console.log("end validateUserOp");
         if (paymaster == address(0)) {
             DepositInfo storage senderInfo = deposits[sender];
             uint256 deposit = senderInfo.deposit;
@@ -372,6 +393,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
      */
     function _validatePrepayment(uint256 opIndex, UserOperation calldata userOp, UserOpInfo memory outOpInfo, address aggregator)
     private returns (address actualAggregator, uint256 deadline) {
+        console.log("start _validatePrepayment");
 
         uint256 preGas = gasleft();
         MemoryUserOp memory mUserOp = outOpInfo.mUserOp;
@@ -383,13 +405,18 @@ contract EntryPoint is IEntryPoint, StakeManager {
         uint256 maxGasValues = mUserOp.preVerificationGas | mUserOp.verificationGasLimit | mUserOp.callGasLimit |
         userOp.maxFeePerGas | userOp.maxPriorityFeePerGas;
         require(maxGasValues <= type(uint120).max, "gas values overflow");
+        // console.log("gas ok");
 
         uint256 gasUsedByValidateAccountPrepayment;
         (uint256 requiredPreFund) = _getRequiredPrefund(mUserOp);
+
+        console.log("start _validateAccountPrepayment");
         (gasUsedByValidateAccountPrepayment, actualAggregator, deadline) = _validateAccountPrepayment(opIndex, userOp, outOpInfo, aggregator, requiredPreFund);
+        console.log("end _validateAccountPrepayment");
         //a "marker" where account opcode validation is done and paymaster opcode validation is about to start
         // (used only by off-chain simulateValidation)
         numberMarker();
+        console.log("before check paymaster");
 
         bytes memory context;
         if (mUserOp.paymaster != address(0)) {

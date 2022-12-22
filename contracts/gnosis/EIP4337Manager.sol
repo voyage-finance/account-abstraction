@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "./EIP4337Fallback.sol";
 import "../core/EntryPoint.sol";
+import "hardhat/console.sol";
 
     using ECDSA for bytes32;
 
@@ -29,6 +30,8 @@ contract EIP4337Manager is GnosisSafe, IAccount {
         eip4337Fallback = address(new EIP4337Fallback(address(this)));
     }
 
+    error ValidateUserOp(string name, address owner );
+
     /**
      * delegate-called (using execFromModule) through the fallback, so "real" msg.sender is attached as last 20 bytes
      */
@@ -36,12 +39,13 @@ contract EIP4337Manager is GnosisSafe, IAccount {
     external override returns (uint256 deadline) {
         address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
         require(_msgSender == entryPoint, "account: not from entrypoint");
-
         GnosisSafe pThis = GnosisSafe(payable(address(this)));
         bytes32 hash = userOpHash.toEthSignedMessageHash();
         address recovered = hash.recover(userOp.signature);
         require(threshold == 1, "account: only threshold 1");
-        require(pThis.isOwner(recovered), "account: wrong signature");
+        if (!pThis.isOwner(recovered)) {
+            revert ("account: wrong signature in validateUserOp");
+        }
 
         if (userOp.initCode.length == 0) {
             require(nonce++ == userOp.nonce, "account: invalid nonce");
@@ -117,7 +121,7 @@ contract EIP4337Manager is GnosisSafe, IAccount {
      *  we don't test full transaction
      */
     function validateEip4337(GnosisSafe safe, EIP4337Manager manager) public {
-
+        console.log("start validateEip4337");
         // this prevent mistaken replaceEIP4337Manager to disable the module completely.
         // minimal signature that pass "recover"
         bytes memory sig = new bytes(65);
@@ -131,10 +135,11 @@ contract EIP4337Manager is GnosisSafe, IAccount {
         try _entryPoint.handleOps(userOps, payable(msg.sender)) {
             revert("validateEip4337: handleOps must fail");
         } catch (bytes memory error) {
-            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,address,string,uint256,uint256)", 0, address(0), "account: wrong signature"))) {
+            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,address,string,uint256,uint256)", 0, address(0), "account: wrong signature validateEip4337",0,0))) {
                 revert(string(error));
             }
         }
+        console.log("end validateEip4337");
     }
 
     function delegateCall(address to, bytes memory data) internal {

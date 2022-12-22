@@ -6,7 +6,9 @@ pragma solidity ^0.8.12;
 /* solhint-disable reason-string */
 
 import "../core/BaseAccount.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "hardhat/console.sol";
 
 /**
   * minimal account.
@@ -22,6 +24,7 @@ contract SimpleAccount is BaseAccount {
     address public owner;
 
     function nonce() public view virtual override returns (uint256) {
+        console.log("nonce...");
         return _nonce;
     }
 
@@ -39,6 +42,7 @@ contract SimpleAccount is BaseAccount {
     constructor(IEntryPoint anEntryPoint, address anOwner) {
         _entryPoint = anEntryPoint;
         owner = anOwner;
+        console.log("SimpleAccount");
     }
 
     modifier onlyOwner() {
@@ -62,6 +66,7 @@ contract SimpleAccount is BaseAccount {
      * execute a transaction (called directly from owner, not by entryPoint)
      */
     function exec(address dest, uint256 value, bytes calldata func) external onlyOwner {
+        console.log("SimpleAccount.exec");
         _call(dest, value, func);
     }
 
@@ -69,6 +74,7 @@ contract SimpleAccount is BaseAccount {
      * execute a sequence of transaction
      */
     function execBatch(address[] calldata dest, bytes[] calldata func) external onlyOwner {
+        console.log("SimpleAccount.execBatch");
         require(dest.length == func.length, "wrong array lengths");
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -103,6 +109,7 @@ contract SimpleAccount is BaseAccount {
 
     // called by entryPoint, only after validateUserOp succeeded.
     function execFromEntryPoint(address dest, uint256 value, bytes calldata func) external {
+        console.log("SimpleAccount.execFromEntryPoint");
         _requireFromEntryPoint();
         _call(dest, value, func);
     }
@@ -118,7 +125,7 @@ contract SimpleAccount is BaseAccount {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
         //ignore signature mismatch of from==ZERO_ADDRESS (for eth_callUserOp validation purposes)
         // solhint-disable-next-line avoid-tx-origin
-        require(owner == hash.recover(userOp.signature) || tx.origin == address(0), "account: wrong signature");
+        require(owner == hash.recover(userOp.signature) || tx.origin == address(0), "account: wrong signature x");
         return 0;
     }
 

@@ -31,7 +31,10 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('EIP4337 Manager address: ', manager.address)
 
   console.log('deploy TestCounter')
-  const counter = await new TestCounter__factory(ethersSigner).deploy()
+  const counter = await deploy('TestCounter', {
+    from: owner,
+    log: true
+  })
   console.log('Test counter address: ', counter.address)
   console.log('deploy SafeProxy')
   const safeProxy4337 = await deploy('SafeProxy4337', {
@@ -42,9 +45,11 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('Safe Proxy address: ', safeProxy4337.address)
 
   console.log('deploy SimpleAccount')
-  const simpleAccount = await deploy('', {
+  const simpleAccount = await deploy('SimpleAccount', {
+    contract: 'contracts/samples/SimpleAccount.sol:SimpleAccount',
     from: owner,
-    args: [entryPoint.address, '0xeecc6df760b5da6e40559a3b7b143614edaa6aa2']
+    args: [entryPoint.address, '0xeecc6df760b5da6e40559a3b7b143614edaa6aa2'],
+    log: true
   })
   console.log('simpleAccount address: ', simpleAccount.address)
 }
