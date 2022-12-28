@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as safeContracts from "./safe-contracts";
+export * as zodiac from "./zodiac";

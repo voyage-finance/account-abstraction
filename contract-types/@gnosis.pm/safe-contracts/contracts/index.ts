@@ -9,4 +9,6 @@ import type * as handler from "./handler";
 export type { handler };
 import type * as interfaces from "./interfaces";
 export type { interfaces };
+import type * as proxies from "./proxies";
+export type { proxies };
 export type { GnosisSafe } from "./GnosisSafe";

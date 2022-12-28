@@ -5,5 +5,6 @@ export * as bls from "./bls";
 export * as core from "./core";
 export * as gnosis from "./gnosis";
 export * as interfaces from "./interfaces";
+export * as role from "./role";
 export * as samples from "./samples";
 export * as test from "./test";

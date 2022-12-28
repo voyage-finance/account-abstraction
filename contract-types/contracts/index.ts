@@ -9,6 +9,8 @@ import type * as gnosis from "./gnosis";
 export type { gnosis };
 import type * as interfaces from "./interfaces";
 export type { interfaces };
+import type * as role from "./role";
+export type { role };
 import type * as samples from "./samples";
 export type { samples };
 import type * as test from "./test";

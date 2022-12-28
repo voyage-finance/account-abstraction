@@ -5,4 +5,5 @@ export * as base from "./base";
 export * as common from "./common";
 export * as handler from "./handler";
 export * as interfaces from "./interfaces";
+export * as proxies from "./proxies";
 export { GnosisSafe__factory } from "./GnosisSafe__factory";

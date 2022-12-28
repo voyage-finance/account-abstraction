@@ -113,6 +113,7 @@ export declare namespace IEntryPoint {
 export declare namespace EntryPoint {
   export type MemoryUserOpStruct = {
     sender: PromiseOrValue<string>;
+    roleModifieAddr: PromiseOrValue<string>;
     nonce: PromiseOrValue<BigNumberish>;
     callGasLimit: PromiseOrValue<BigNumberish>;
     verificationGasLimit: PromiseOrValue<BigNumberish>;
@@ -124,6 +125,7 @@ export declare namespace EntryPoint {
 
   export type MemoryUserOpStructOutput = [
     string,
+    string,
     BigNumber,
     BigNumber,
     BigNumber,
@@ -133,6 +135,7 @@ export declare namespace EntryPoint {
     BigNumber
   ] & {
     sender: string;
+    roleModifieAddr: string;
     nonce: BigNumber;
     callGasLimit: BigNumber;
     verificationGasLimit: BigNumber;
@@ -176,7 +179,7 @@ export interface EntryPointInterface extends utils.Interface {
     "getUserOpHash((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes))": FunctionFragment;
     "handleAggregatedOps(((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes)[],address,bytes)[],address)": FunctionFragment;
     "handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes)[],address)": FunctionFragment;
-    "innerHandleOp(bytes,((address,uint256,uint256,uint256,uint256,address,uint256,uint256),bytes32,uint256,uint256,uint256),bytes)": FunctionFragment;
+    "innerHandleOp(bytes,((address,address,uint256,uint256,uint256,uint256,address,uint256,uint256),bytes32,uint256,uint256,uint256),bytes)": FunctionFragment;
     "simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes))": FunctionFragment;
     "unlockStake()": FunctionFragment;
     "withdrawStake(address)": FunctionFragment;
