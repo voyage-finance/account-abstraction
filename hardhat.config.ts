@@ -1,11 +1,13 @@
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
+import '@nomicfoundation/hardhat-toolbox'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
 import * as tdly from '@tenderly/hardhat-tenderly'
 import { config as dotenvConfig } from 'dotenv'
 import { resolve } from 'path'
+import 'tsconfig-paths/register'
 import 'solidity-coverage'
 import * as fs from 'fs'
 

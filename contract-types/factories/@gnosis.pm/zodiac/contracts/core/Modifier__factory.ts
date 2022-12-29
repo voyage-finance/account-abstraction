@@ -489,7 +489,7 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class Modifier__factory {
   static readonly abi = _abi;

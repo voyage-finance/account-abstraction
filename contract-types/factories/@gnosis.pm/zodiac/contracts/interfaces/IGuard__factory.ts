@@ -91,7 +91,7 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class IGuard__factory {
   static readonly abi = _abi;

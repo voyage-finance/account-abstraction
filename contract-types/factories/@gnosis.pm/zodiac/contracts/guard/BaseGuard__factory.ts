@@ -110,7 +110,7 @@ const _abi = [
     stateMutability: "pure",
     type: "function",
   },
-];
+] as const;
 
 export class BaseGuard__factory {
   static readonly abi = _abi;

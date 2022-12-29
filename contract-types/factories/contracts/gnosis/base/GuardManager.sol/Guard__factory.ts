@@ -110,7 +110,7 @@ const _abi = [
     stateMutability: "view",
     type: "function",
   },
-];
+] as const;
 
 export class Guard__factory {
   static readonly abi = _abi;

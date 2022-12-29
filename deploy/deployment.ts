@@ -54,7 +54,7 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: owner,
     args: [owner, safeProxy4337.address, safeProxy4337.address],
     libraries: {
-      Permissions: permissions.address,
+      Permissions: permissions.address
     },
     log: true
   })
