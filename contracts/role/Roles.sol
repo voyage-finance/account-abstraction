@@ -49,12 +49,12 @@ contract Roles is Modifier {
             initParams,
             (address, address, address)
         );
-        __Ownable_init();
+        // __Ownable_init();
 
         avatar = _avatar;
         target = _target;
 
-        transferOwnership(_owner);
+        _transferOwnership(_owner);
         setupModules();
 
         emit RolesModSetup(msg.sender, _owner, _avatar, _target);
