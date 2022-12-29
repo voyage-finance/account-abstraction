@@ -8,8 +8,6 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments
   const { owner } = await getNamedAccounts()
   console.log('deploy GnosisSafe Factory')
-  const provider = ethers.provider
-  const ethersSigner = provider.getSigner()
   const safeSingleton = await deploy('GnosisSafe', {
     contract: 'contracts/gnosis/GnosisSafe.sol:GnosisSafe',
     from: owner,
@@ -39,16 +37,37 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('deploy SafeProxy')
   const safeProxy4337 = await deploy('SafeProxy4337', {
     from: owner,
-    args: [safeSingleton.address, manager.address, owner],
+    args: [safeSingleton.address, manager.address, '0xeeCC6df760B5Da6e40559a3B7B143614eDaa6aA2'],
     log: true
   })
   console.log('Safe Proxy address: ', safeProxy4337.address)
+
+  console.log('deploy Permission')
+  const permissions = await deploy('Permissions', {
+    from: owner,
+    log: true
+  })
+  console.log('Permissions address: ', permissions.address)
+
+  console.log('deploy Role')
+  const modifier = await deploy('Roles', {
+    from: owner,
+    args: [owner, safeProxy4337.address, safeProxy4337.address],
+    libraries: {
+      Permissions: permissions.address,
+    },
+    log: true
+  })
+  console.log('receipt: ', modifier.receipt)
+  console.log('Modifier address: ', modifier.address)
+
+  console.log('enable module')
 
   console.log('deploy SimpleAccount')
   const simpleAccount = await deploy('SimpleAccount', {
     contract: 'contracts/samples/SimpleAccount.sol:SimpleAccount',
     from: owner,
-    args: [entryPoint.address, '0xeecc6df760b5da6e40559a3b7b143614edaa6aa2'],
+    args: [entryPoint.address, '0xeeCC6df760B5Da6e40559a3B7B143614eDaa6aA2'],
     log: true
   })
   console.log('simpleAccount address: ', simpleAccount.address)
