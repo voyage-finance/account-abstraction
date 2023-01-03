@@ -160,6 +160,8 @@ export type { TokenPaymaster } from "./contracts/samples/TokenPaymaster";
 export { TokenPaymaster__factory } from "./factories/contracts/samples/TokenPaymaster__factory";
 export type { VerifyingPaymaster } from "./contracts/samples/VerifyingPaymaster";
 export { VerifyingPaymaster__factory } from "./factories/contracts/samples/VerifyingPaymaster__factory";
+export type { TestContract } from "./contracts/test/TestContract";
+export { TestContract__factory } from "./factories/contracts/test/TestContract__factory";
 export type { TestCounter } from "./contracts/test/TestCounter";
 export { TestCounter__factory } from "./factories/contracts/test/TestCounter__factory";
 export type { TestExpirePaymaster } from "./contracts/test/TestExpirePaymaster";
