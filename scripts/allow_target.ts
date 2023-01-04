@@ -1,10 +1,11 @@
 import { ethers } from 'hardhat'
 
 async function main () {
+  const roleId = '0'
+  const OPTIONS_NONE = 0
+  const businessContractAddr = '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853'
   const roles = await ethers.getContractAt('Roles', '0x0165878A594ca255338adfa4d48449f69242Eb8F')
-  let tx = await roles.assignRoles('0xeeCC6df760B5Da6e40559a3B7B143614eDaa6aA2', [0], [true])
-  await tx.wait()
-  tx = await roles.assignRoles('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', [0], [true])
+  const tx = await roles.allowTarget(roleId, businessContractAddr, OPTIONS_NONE)
   await tx.wait()
 }
 

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
+import "hardhat/console.sol";
+
 contract TestContract {
     event Receive();
     event ReceiveFallback(uint256 amount);
@@ -57,6 +59,7 @@ contract TestContract {
     }
 
     function doNothing() public {
+        console.log('doNothing');
         emit DoNothing();
     }
 

@@ -2,11 +2,12 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { TestCounter__factory } from '../typechain'
-import { Roles } from '../contract-types'
+import { Roles, SafeProxy4337 } from '../contract-types'
+import { ModuleManager } from '../contract-types/contracts/gnosis/base'
 
 const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre
-  const { deploy } = deployments
+  const { deploy, execute } = deployments
   const { owner } = await getNamedAccounts()
   const user = '0xeeCC6df760B5Da6e40559a3B7B143614eDaa6aA2'
   console.log('deploy GnosisSafe Factory')
@@ -39,7 +40,7 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('deploy SafeProxy')
   const safeProxy4337 = await deploy('SafeProxy4337', {
     from: owner,
-    args: [safeSingleton.address, manager.address, user],
+    args: [safeSingleton.address, manager.address, owner],
     log: true
   })
   console.log('Safe Proxy address: ', safeProxy4337.address)
@@ -62,6 +63,9 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   })
   console.log('Roles address: ', roles.address)
 
+  console.log('enable module from safeProxy')
+  const safeProxyImpl = await ethers.getContractAt('contracts/gnosis/GnosisSafe.sol:GnosisSafe', safeProxy4337.address)
+
   console.log('deploy TestContract')
   const testContract = await deploy('TestContract', {
     from: owner,
@@ -71,7 +75,7 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log('enable module')
   const modifier: Roles = await ethers.getContractAt('Roles', roles.address)
-  await modifier.enableModule(user)
+  await modifier.enableModule(testContract.address)
 
   console.log('deploy SimpleAccount')
   const simpleAccount = await deploy('SimpleAccount', {
