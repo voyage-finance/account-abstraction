@@ -90,6 +90,10 @@ contract EIP4337Manager is GnosisSafe, IAccount {
         _enableModule(eip4337fallback);
     }
 
+    function setupRoleModifier(address roleModifier) external {
+        _enableModule(roleModifier);
+    }
+
     /**
      * replace EIP4337 module, to support a new EntryPoint.
      * must be called using execTransaction and Enum.Operation.DelegateCall

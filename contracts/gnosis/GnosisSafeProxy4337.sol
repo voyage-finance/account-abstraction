@@ -6,6 +6,7 @@ pragma solidity ^0.8.7;
 import "./EIP4337Manager.sol";
 import "hardhat/console.sol";
 import "./GnosisSafeProxy.sol";
+// import "./base/ModuleManager.sol";
 
 /**
  * Create a proxy to a GnosisSafe, which accepts calls through Account-Abstraction.
@@ -22,5 +23,13 @@ contract SafeProxy4337 is GnosisSafeProxy {
         (bool success,bytes memory ret) = address(aaModule).delegatecall(abi.encodeCall(
                 EIP4337Manager.setupEIP4337, (singleton, aaModule, owner)));
         require(success, string(ret));
+    }
+
+    // todo init once
+    function setupRoleModifier(EIP4337Manager aaModule, address module) public {
+        console.log("Setup Role Modifier");
+        (bool success,bytes memory ret) = address(aaModule).delegatecall(abi.encodeCall(EIP4337Manager.setupRoleModifier,(module)));
+        require(success, string(ret));
+        
     }
 }

@@ -2,6 +2,7 @@
 pragma solidity ^0.8.6;
 
 import "@gnosis.pm/zodiac/contracts/core/Modifier.sol";
+import "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import "./Permissions.sol";
 
 contract Roles is Modifier {
@@ -56,7 +57,7 @@ contract Roles is Modifier {
 
         _transferOwnership(_owner);
         setupModules();
-
+        
         emit RolesModSetup(msg.sender, _owner, _avatar, _target);
     }
 

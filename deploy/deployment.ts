@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { TestCounter__factory } from '../typechain'
-import { Roles, SafeProxy4337 } from '../contract-types'
+import { Roles, SafeProxy4337, TestContract } from '../contract-types'
 import { ModuleManager } from '../contract-types/contracts/gnosis/base'
 
 const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -64,7 +64,8 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log('Roles address: ', roles.address)
 
   console.log('enable module from safeProxy')
-  const safeProxyImpl = await ethers.getContractAt('contracts/gnosis/GnosisSafe.sol:GnosisSafe', safeProxy4337.address)
+  const safeProxy = await ethers.getContractAt('SafeProxy4337', safeProxy4337.address)
+  await safeProxy.setupRoleModifier(manager.address, roles.address)
 
   console.log('deploy TestContract')
   const testContract = await deploy('TestContract', {
@@ -85,6 +86,17 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true
   })
   console.log('simpleAccount address: ', simpleAccount.address)
+
+  console.log('assign role')
+  await modifier.assignRoles(user, [0], [true])
+  await modifier.assignRoles(owner, [0], [true])
+
+  console.log('allow target')
+  await modifier.allowTarget(0, testContract.address, 0)
+
+  console.log('execute transaction from modules')
+  const businessContract: TestContract = await ethers.getContractAt('TestContract', testContract.address)
+  await modifier.execTransactionFromModule(testContract.address, 0, businessContract.interface.encodeFunctionData('doNothing()'), 0)
 }
 
 export default main

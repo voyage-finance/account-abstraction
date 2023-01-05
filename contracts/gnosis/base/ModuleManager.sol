@@ -32,6 +32,7 @@ contract ModuleManager is SelfAuthorized, Executor {
     /// @notice Enables the module `module` for the Safe.
     /// @param module Module to be whitelisted.
     function enableModule(address module) public authorized {
+        console.log("enable module: ", module);
         // Module address cannot be null or sentinel.
         require(module != address(0) && module != SENTINEL_MODULES, "GS101");
         // Module cannot be added twice.
@@ -69,7 +70,7 @@ contract ModuleManager is SelfAuthorized, Executor {
         console.log("execTransactionFromModule");
         // Only whitelisted modules are allowed.
         console.log("msg.sender: ", msg.sender);
-        // require(msg.sender != SENTINEL_MODULES && modules[msg.sender] != address(0), "GS104");
+        require(msg.sender != SENTINEL_MODULES && modules[msg.sender] != address(0), "GS104");
         console.log("start executing transaction");
         // Execute transaction without further confirmations.
         success = execute(to, value, data, operation, gasleft());

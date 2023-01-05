@@ -103,6 +103,7 @@ export interface EIP4337ManagerInterface extends utils.Interface {
     "setGuard(address)": FunctionFragment;
     "setup(address[],uint256,address,bytes,address,address,uint256,address)": FunctionFragment;
     "setupEIP4337(address,address,address)": FunctionFragment;
+    "setupRoleModifier(address)": FunctionFragment;
     "signedMessages(bytes32)": FunctionFragment;
     "simulateAndRevert(address,bytes)": FunctionFragment;
     "swapOwner(address,address,address)": FunctionFragment;
@@ -145,6 +146,7 @@ export interface EIP4337ManagerInterface extends utils.Interface {
       | "setGuard"
       | "setup"
       | "setupEIP4337"
+      | "setupRoleModifier"
       | "signedMessages"
       | "simulateAndRevert"
       | "swapOwner"
@@ -354,6 +356,10 @@ export interface EIP4337ManagerInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "setupRoleModifier",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "signedMessages",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -489,6 +495,10 @@ export interface EIP4337ManagerInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "setup", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setupEIP4337",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setupRoleModifier",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -920,6 +930,11 @@ export interface EIP4337Manager extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setupRoleModifier(
+      roleModifier: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     signedMessages(
       arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -1153,6 +1168,11 @@ export interface EIP4337Manager extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setupRoleModifier(
+    roleModifier: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   signedMessages(
     arg0: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -1383,6 +1403,11 @@ export interface EIP4337Manager extends BaseContract {
       singleton: PromiseOrValue<string>,
       manager: PromiseOrValue<string>,
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setupRoleModifier(
+      roleModifier: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1715,6 +1740,11 @@ export interface EIP4337Manager extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setupRoleModifier(
+      roleModifier: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     signedMessages(
       arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -1946,6 +1976,11 @@ export interface EIP4337Manager extends BaseContract {
       singleton: PromiseOrValue<string>,
       manager: PromiseOrValue<string>,
       owner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setupRoleModifier(
+      roleModifier: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
